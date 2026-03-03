@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'recherche_page.dart';
+import 'services/api_service.dart';
 
 class CommandePage extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class _CommandePageState extends State<CommandePage> {
 
   final TextEditingController destinationController = TextEditingController();
   String typeVehicule = "Standard";
+  String selectedType = "Standard";
 
   double calculerPrix(String destination) {
     double prix = 500 + destination.length * 50;
@@ -123,18 +125,30 @@ class _CommandePageState extends State<CommandePage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
+      onPressed: () async {
+  String destination = destinationController.text;
+  double prix = calculerPrix(destination);
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RecherchePage(
-                    destination: destination,
-                  ),
-                ),
-              );
-            },
+  // ✅ ENVOI AU BACKEND
+  await ApiService.createCourse(
+    destination: destination,
+    typeVehicule: selectedType,
+    prix: prix,
+  );
+
+  // ✅ Ferme le popup
+  Navigator.pop(context);
+
+  // ✅ Navigation vers recherche chauffeur
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => RecherchePage(
+        destination: destination,
+      ),
+    ),
+  );
+},
             child: Text("OK"),
           ),
         ],
